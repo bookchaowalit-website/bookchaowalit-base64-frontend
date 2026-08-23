@@ -1,100 +1,17 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 
 async function copyText(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
-  }
+  try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
 }
-
-function Shell({
-  title,
-  subtitle,
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-100">
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        <header className="mb-8">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-            Client-side utility · no server required
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">{title}</h1>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>
-        </header>
-        {children}
-        <footer className="mt-10 border-t border-zinc-200 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-500">
-          Data stays in your browser. Part of the Bookchaowalit developer tools portfolio.
-        </footer>
-      </div>
-    </div>
-  );
-}
-
-function Button({
-  children,
-  onClick,
-  variant = "primary",
-  disabled,
-  type = "button",
-}: {
-  children: ReactNode;
-  onClick?: () => void;
-  variant?: "primary" | "secondary" | "ghost";
-  disabled?: boolean;
-  type?: "button" | "submit";
-}) {
-  const base =
-    "inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50";
-  const styles =
-    variant === "primary"
-      ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
-      : variant === "secondary"
-        ? "bg-white text-zinc-900 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-700 dark:hover:bg-zinc-800"
-        : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900";
-  return (
-    <button type={type} disabled={disabled} onClick={onClick} className={`${base} ${styles}`}>
-      {children}
-    </button>
-  );
-}
-
-function Field({
-  label,
-  children,
-  hint,
-}: {
-  label: string;
-  children: ReactNode;
-  hint?: string;
-}) {
-  return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{label}</span>
-      {children}
-      {hint ? <span className="block text-xs text-zinc-500">{hint}</span> : null}
-    </label>
-  );
-}
-
-const inputClass =
-  "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 font-mono text-sm text-zinc-900 outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
-const areaClass = `${inputClass} min-h-[160px] resize-y`;
 
 export default function Home() {
   const [input, setInput] = useState("Hello, portfolio!");
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
   const [mode, setMode] = useState<"encode" | "decode">("encode");
-  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState("BENCH READY / LOCAL ONLY");
 
   const run = () => {
     setError("");
@@ -102,77 +19,68 @@ export default function Home() {
       if (mode === "encode") {
         const bytes = new TextEncoder().encode(input);
         let binary = "";
-        bytes.forEach((b) => {
-          binary += String.fromCharCode(b);
-        });
+        bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
         setOutput(btoa(binary));
+        setStatus("PRINT READY / BASE64 OUTPUT");
       } else {
         const binary = atob(input.trim());
-        const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+        const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
         setOutput(new TextDecoder().decode(bytes));
+        setStatus("PRINT READY / UTF-8 TEXT");
       }
     } catch {
       setOutput("");
-      setError(mode === "encode" ? "Could not encode input." : "Invalid Base64 input.");
+      setError(mode === "encode" ? "The text could not be exposed." : "The tray contains invalid Base64.");
+      setStatus("HOLD / CHECK INPUT");
     }
   };
 
   const swap = () => {
-    setInput(output);
-    setOutput(input);
-    setMode((m) => (m === "encode" ? "decode" : "encode"));
-    setError("");
+    setInput(output); setOutput(input);
+    setMode((current) => (current === "encode" ? "decode" : "encode"));
+    setError(""); setStatus("TRAYS SWAPPED / READY");
   };
-
-  const handleCopy = async () => {
+  const clear = () => { setInput(""); setOutput(""); setError(""); setStatus("BENCH CLEARED / LOCAL ONLY"); };
+  const copy = async () => {
     if (!output) return;
-    if (await copyText(output)) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    }
+    setStatus((await copyText(output)) ? "COPIED / OUTPUT IN CLIPBOARD" : "COPY BLOCKED / SELECT OUTPUT");
   };
 
   return (
-    <Shell
-      title="Base64 Encoder / Decoder"
-      subtitle="UTF-8 safe encode and decode. Useful for tokens, data URLs, and quick debugging."
-    >
-      <div className="mb-4 flex flex-wrap gap-2">
-        <Button variant={mode === "encode" ? "primary" : "secondary"} onClick={() => setMode("encode")}>
-          Encode
-        </Button>
-        <Button variant={mode === "decode" ? "primary" : "secondary"} onClick={() => setMode("decode")}>
-          Decode
-        </Button>
-        <Button variant="ghost" onClick={swap}>
-          Swap I/O
-        </Button>
+    <main className="exposure-page">
+      <div className="exposure-shell">
+        <header className="exposure-header">
+          <div className="exposure-mark">EXPOSURE / 64</div>
+          <div className="exposure-status" aria-live="polite">{status}</div>
+          <p className="exposure-note">A UTF-8-safe Base64 bench. Nothing leaves this browser.</p>
+        </header>
+        <section className="exposure-intro" aria-labelledby="page-title">
+          <div>
+            <h1 id="page-title">Develop the payload.</h1>
+            <p>Move between readable text and Base64 without losing the trail. The result stays in the tray until you take it.</p>
+          </div>
+          <div className="exposure-receipt" role="group" aria-label="Current operation">
+            <span>PROCESS</span><strong>{mode === "encode" ? "EXPOSE → ENCODE" : "DEVELOP → DECODE"}</strong><small>TEXT ONLY / NO UPLOAD</small>
+          </div>
+        </section>
+        <nav className="exposure-switch" aria-label="Conversion direction">
+          <button type="button" className={mode === "encode" ? "is-active" : ""} onClick={() => setMode("encode")}>01 / Expose to Base64</button>
+          <button type="button" className={mode === "decode" ? "is-active" : ""} onClick={() => setMode("decode")}>02 / Develop to text</button>
+        </nav>
+        <section className="exposure-bench" aria-label="Base64 workbench">
+          <label className="exposure-tray"><span className="tray-label">{mode === "encode" ? "SOURCE / PLAIN TEXT" : "SOURCE / BASE64"}</span><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="Source input" spellCheck={false} /><span className="tray-footer">{input.length} characters · edit before processing</span></label>
+          <div className="exposure-arrow" aria-hidden="true">→</div>
+          <label className="exposure-tray result-tray"><span className="tray-label">RESULT / {mode === "encode" ? "BASE64" : "PLAIN TEXT"}</span><textarea value={output} readOnly aria-label="Conversion result" placeholder="The developed result appears here." spellCheck={false} /><span className="tray-footer">{output.length} characters · safe to copy</span></label>
+        </section>
+        {error ? <p className="exposure-error" role="alert">{error}</p> : null}
+        <div className="exposure-actions">
+          <button type="button" className="exposure-primary" onClick={run}>{mode === "encode" ? "Expose payload" : "Develop payload"}</button>
+          <button type="button" className="exposure-secondary" onClick={copy} disabled={!output}>Take result</button>
+          <button type="button" className="exposure-quiet" onClick={swap}>Swap trays</button>
+          <button type="button" className="exposure-quiet" onClick={clear}>Clear bench</button>
+        </div>
+        <footer className="exposure-footer">BROWSER PROCESSING / NO SERVER REQUIRED / BOOKCHAOWALIT DEVELOPER TOOLS</footer>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field label={mode === "encode" ? "Plain text" : "Base64 input"}>
-          <textarea className={areaClass} value={input} onChange={(e) => setInput(e.target.value)} />
-        </Field>
-        <Field label="Result">
-          <textarea className={areaClass} value={output} readOnly placeholder="Result appears here" />
-        </Field>
-      </div>
-      {error ? <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p> : null}
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button onClick={run}>{mode === "encode" ? "Encode →" : "Decode →"}</Button>
-        <Button variant="secondary" onClick={handleCopy} disabled={!output}>
-          {copied ? "Copied" : "Copy result"}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => {
-            setInput("");
-            setOutput("");
-            setError("");
-          }}
-        >
-          Clear
-        </Button>
-      </div>
-    </Shell>
+    </main>
   );
 }

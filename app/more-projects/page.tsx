@@ -58,10 +58,6 @@ const CATEGORIES: ProjectCategory[] = [
         "url": "https://bookchaowalit-jsonconverter-frontend.vercel.app"
       },
       {
-        "name": "Base64 Encoder",
-        "url": "https://bookchaowalit-base64-frontend.vercel.app"
-      },
-      {
         "name": "Regex Tester",
         "url": "https://bookchaowalit-regex-frontend.vercel.app"
       },

@@ -14,8 +14,6 @@ and CI running lint, typecheck, tests, and build.
 - Confirm the canonical production domain (`lib/site.ts` falls back to
   `https://base64.bookchaowalit.com`; the portfolio list links the
   `*-frontend.vercel.app` URL) and set `NEXT_PUBLIC_SITE_URL` in Vercel.
-- Add an Open Graph image (layout declares `summary_large_image` without one).
-- Refresh `PRODUCT.md` "Source README excerpt" (still quotes create-next-app).
 
 ### P2
 - Optional file input (drag-and-drop) for text files, still browser-only.
@@ -35,3 +33,8 @@ and CI running lint, typecheck, tests, and build.
   `app/robots.ts` / `app/sitemap.ts`; added canonical + `og:url`.
 - a11y: `aria-pressed` mode toggles, error linked to the input, focus rings on
   inputs and links. Removed `app/page.tsx.backup`.
+
+## Done in this pass (pass 2)
+- Generated `app/opengraph-image.tsx` social card (1200×630 PNG at build time, site palette) so `summary_large_image` has a real image.
+- `/more-projects` no longer links to this app itself.
+- `PRODUCT.md`: dropped the broken create-next-app "Source README excerpt" (its open code fence swallowed the rest of the brief); points to README/CI checks instead.

@@ -49,3 +49,4 @@ and CI running lint, typecheck, tests, and build.
     whitespace.
   - Encoding text with an unpaired surrogate silently became U+FFFD, so the
     round trip changed the data; it now raises a clear `Base64Error`.
+- Security deps: `next` 16.1.6 -> 16.3.8 (and `eslint-config-next`) clears critical GHSA-2xp9-vwfh-vxw4 (Image Optimization RCE) plus bundled postcss/sharp highs; lockfile regenerated with same-major `npm audit fix`. `npm audit --omit=dev`: C1/H3/M1/L0 [nanoid:h,next:c,postcss:h,sharp:h] -> C0/H0/M0/L0.

@@ -38,3 +38,14 @@ and CI running lint, typecheck, tests, and build.
 - Generated `app/opengraph-image.tsx` social card (1200×630 PNG at build time, site palette) so `summary_large_image` has a real image.
 - `/more-projects` no longer links to this app itself.
 - `PRODUCT.md`: dropped the broken create-next-app "Source README excerpt" (its open code fence swallowed the rest of the brief); points to README/CI checks instead.
+
+## Done in this pass (pass 3)
+- Edge-case pass on `lib/base64.ts` (regression tests in `tests/base64.test.ts`):
+  - Tray counters showed `string.length` (UTF-16 units): one emoji read as
+    "2 characters", a family emoji as 8. They now show graphemes plus the
+    UTF-8 byte size (`textStats`), with singular/plural labels.
+  - Decoding rejected Base64 pasted with a zero-width space, joiner or BOM
+    (invisible, so the error was baffling); these are now stripped like
+    whitespace.
+  - Encoding text with an unpaired surrogate silently became U+FFFD, so the
+    round trip changed the data; it now raises a clear `Base64Error`.

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { Base64Error, decodeBase64, encodeBase64, normalizeBase64 } from "../lib/base64.ts";
+import { Base64Error, decodeBase64, encodeBase64, normalizeBase64, plural, textStats } from "../lib/base64.ts";
 
 describe("encodeBase64", () => {
   it("encodes ASCII and multi-byte UTF-8 text", () => {
@@ -36,5 +36,29 @@ describe("decodeBase64", () => {
 
   it("rejects bytes that are not valid UTF-8", () => {
     assert.throws(() => decodeBase64("/w=="), /not valid UTF-8/);
+  });
+});
+
+describe("edge cases", () => {
+  it("ignores zero-width characters and BOM pasted from web pages", () => {
+    assert.equal(decodeBase64("﻿SGVs​bG8=‍"), "Hello");
+  });
+
+  it("refuses to encode text with an unpaired surrogate instead of silently changing it", () => {
+    assert.throws(() => encodeBase64("a\uD83D"), Base64Error);
+    assert.throws(() => encodeBase64("\uDE00b"), Base64Error);
+    assert.equal(decodeBase64(encodeBase64("ok 😀")), "ok 😀");
+  });
+
+  it("counts user-perceived characters and UTF-8 bytes, not UTF-16 code units", () => {
+    assert.deepEqual(textStats("😀"), { characters: 1, bytes: 4 });
+    assert.deepEqual(textStats("👨‍👩‍👧"), { characters: 1, bytes: 18 });
+    assert.deepEqual(textStats("ที่"), { characters: 1, bytes: 9 });
+    assert.deepEqual(textStats(""), { characters: 0, bytes: 0 });
+  });
+
+  it("pluralizes counter labels", () => {
+    assert.equal(plural(1, "byte"), "1 byte");
+    assert.equal(plural(0, "byte"), "0 bytes");
   });
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Base64Error, decodeBase64, encodeBase64 } from "@/lib/base64";
+import { Base64Error, decodeBase64, encodeBase64, plural, textStats } from "@/lib/base64";
 
 async function copyText(text: string) {
   try { await navigator.clipboard.writeText(text); return true; } catch { return false; }
@@ -14,6 +14,8 @@ export default function Home() {
   const [mode, setMode] = useState<"encode" | "decode">("encode");
   const [urlSafe, setUrlSafe] = useState(false);
   const [status, setStatus] = useState("BENCH READY / LOCAL ONLY");
+  const inputStats = textStats(input);
+  const outputStats = textStats(output);
 
   const run = () => {
     setError("");
@@ -65,9 +67,9 @@ export default function Home() {
           <button type="button" className={mode === "decode" ? "is-active" : ""} aria-pressed={mode === "decode"} onClick={() => setMode("decode")}>02 / Develop to text</button>
         </div>
         <section className="exposure-bench" aria-label="Base64 workbench">
-          <label className="exposure-tray"><span className="tray-label">{mode === "encode" ? "SOURCE / PLAIN TEXT" : "SOURCE / BASE64"}</span><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="Source input" aria-invalid={error ? true : undefined} aria-describedby={error ? "exposure-error" : undefined} spellCheck={false} /><span className="tray-footer">{input.length} characters · edit before processing</span></label>
+          <label className="exposure-tray"><span className="tray-label">{mode === "encode" ? "SOURCE / PLAIN TEXT" : "SOURCE / BASE64"}</span><textarea value={input} onChange={(event) => setInput(event.target.value)} aria-label="Source input" aria-invalid={error ? true : undefined} aria-describedby={error ? "exposure-error" : undefined} spellCheck={false} /><span className="tray-footer">{plural(inputStats.characters, "character")} · {plural(inputStats.bytes, "byte")} · edit before processing</span></label>
           <div className="exposure-arrow" aria-hidden="true">→</div>
-          <label className="exposure-tray result-tray"><span className="tray-label">RESULT / {mode === "encode" ? "BASE64" : "PLAIN TEXT"}</span><textarea value={output} readOnly aria-label="Conversion result" placeholder="The developed result appears here." spellCheck={false} /><span className="tray-footer">{output.length} characters · safe to copy</span></label>
+          <label className="exposure-tray result-tray"><span className="tray-label">RESULT / {mode === "encode" ? "BASE64" : "PLAIN TEXT"}</span><textarea value={output} readOnly aria-label="Conversion result" placeholder="The developed result appears here." spellCheck={false} /><span className="tray-footer">{plural(outputStats.characters, "character")} · {plural(outputStats.bytes, "byte")} · safe to copy</span></label>
         </section>
         {error ? <p id="exposure-error" className="exposure-error" role="alert">{error}</p> : null}
         <div className="exposure-actions">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Fira_Code } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -22,10 +23,12 @@ export const metadata: Metadata = {
   authors: [{ name: "Bookchaowalit", url: "https://bookchaowalit.com" }],
   creator: "Bookchaowalit",
   publisher: "Bookchaowalit",
-  metadataBase: new URL("https://base64.bookchaowalit.com"),
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_US",
+    url: "/",
     title: "Exposure / 64 — Base64 bench",
     description: "Encode and decode Base64 text fully in the browser. UTF-8 safe, no upload.",
     siteName: "Bookchaowalit",

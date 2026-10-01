@@ -5,7 +5,7 @@
 body { margin: 0; background: var(--coal); color: var(--paper); font-family: var(--font-barlow), sans-serif; }
 button, textarea { font: inherit; }
 button { cursor: pointer; }
-button:focus-visible, textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+button:focus-visible, textarea:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 .exposure-page { min-height: 100vh; background: var(--coal); }
 .exposure-shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 24px; }
 .exposure-header { display: grid; grid-template-columns: auto 1fr auto; gap: 28px; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 15px; }
@@ -42,3 +42,7 @@ button:focus-visible, textarea:focus-visible { outline: 2px solid var(--blue); o
 .exposure-footer { border-top: 1px solid var(--line); padding-top: 14px; color: #a69b89; }
 @media (max-width: 760px) { .exposure-shell { width: min(100% - 28px, 600px); } .exposure-header { grid-template-columns: 1fr; gap: 8px; } .exposure-status, .exposure-note { text-align: left; } .exposure-intro { display: block; padding: 54px 0 36px; } .exposure-receipt { margin-top: 34px; } .exposure-bench { grid-template-columns: 1fr; gap: 12px; } .exposure-arrow { transform: rotate(90deg); } .exposure-tray textarea { min-height: 190px; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+.exposure-option { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-family: var(--font-fira), monospace; font-size: .72rem; }
+.exposure-option input { accent-color: var(--amber); width: 16px; height: 16px; }
+.exposure-option:has(input:disabled) { opacity: .5; }
+.exposure-hint { color: var(--muted); font-size: .8rem; margin: -26px 0 32px; }
